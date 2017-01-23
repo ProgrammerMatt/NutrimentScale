@@ -35,12 +35,12 @@ int main(int argc, char** argv)
 
 		string url_with_barcode = "http://world.openfoodfacts.org/api/v0/product/"+std::string(buf)+".json";
 		cout << url_with_barcode << endl;
-		string command = "curl "+url_with_barcode+" --output /Users/MattWilfert/Desktop"+std::string(buf)+".json";
+		string command = "curl "+url_with_barcode+" --output /home/matt/"+std::string(buf)+".json";
 		system(command.c_str());
 
 		 FILE *fp;
 		  char measuredWeight[1035];
-
+		  printf("12");
 		  /* Open the command for reading. */
 		  fp = popen("./usbscale/usbscale", "r");
 		  if (fp == NULL) {
@@ -54,22 +54,21 @@ int main(int argc, char** argv)
 		  }
 
 		  /* close */
-		  pclose(fp);
-
-	
-
+		  pclose(fp);	
 
 		boost::property_tree::ptree pt;
-		boost::property_tree::read_json("/Users/MattWilfert/Desktop"+std::string(buf)+".json", pt);
-
+		boost::property_tree::read_json("/home/matt/"+std::string(buf)+".json", pt);
 		boost::property_tree::basic_ptree<std::string,std::string>::const_iterator iter = pt.begin(),iterEnd = pt.end();
 
 		string serving = pt.get<string>("product.serving_size");
-		int index_of_space = serving.find(" ");
-		string temp = serving.substr(0, index_of_space);
+		int index_of_space = 0;
+		
+		
+
+		//string temp = serving.substr(0, index_of_space);
 		//int serving_size = stoi(temp);
-		int serving_size = atoi(temp.c_str());
-		string serving_type = serving.substr(index_of_space);
+		int serving_size = 2;//atoi(temp.c_str());
+		string serving_type = "g";//serving.substr(index_of_space);
 
 		int measuredWeightInt = atoi(measuredWeight);
 		double ratio = (int)measuredWeightInt / (int)serving_size; 
@@ -92,10 +91,10 @@ int main(int argc, char** argv)
 		int calories = ratio*((fats * 9) + (proteins * 4) + (carbohydrates * 4));
 		cout << "Calories: " << calories << endl;
 
-		system(("rm /Users/MattWilfert/Desktop"+std::string(buf)+".json").c_str());
+		system(("rm /home/matt/"+std::string(buf)+".json").c_str());
 		replace(product_name.begin(), product_name.end(), ' ', '_');
 		cout << product_name << endl;
 
-		system(("python html_scraper.py "+std::string(product_name)+" "+std::to_string(measuredWeightInt)).c_str());
+		//system(("python html_scraper.py "+std::string(product_name)+" "+std::to_string(measuredWeightInt)).c_str());
 	}
 }
